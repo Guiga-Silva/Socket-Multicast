@@ -4,50 +4,56 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
+import java.time.LocalDate;
+import java.util.Scanner;
 
-public class ClientMulticast {
+public class ClientMulticast implements Runnable {
 	public static void main(String[] args) throws IOException {
 
-		int PORT_ESPORTE = 22622;
-		int PORT_ENTRETENIMENTO = 66266;
+		int PORTA_ESPORTE = 22622;
+		int PORTA_ENTRETENIMENTO = 3000;
+		Scanner sc = new Scanner(System.in);
 
-		String msg = " ";
-
-		// Duas portas diferentes, uma para entretenimento e outra para esportes
-		MulticastSocket socket = new MulticastSocket(4321);
+		String mensagem = " ";
+		
+		
+		MulticastSocket socketEsporte = new MulticastSocket(PORTA_ESPORTE);
+		MulticastSocket socketEntretenimento = new MulticastSocket(PORTA_ENTRETENIMENTO);
 
 		InetAddress ia = InetAddress.getByName("230.0.0.0");
 
-		// Um grupo para entretenimento e outro para esportes
-		InetSocketAddress grupo = new InetSocketAddress(ia, 4321);
-
+		
 		NetworkInterface ni = NetworkInterface.getByInetAddress(ia);
 
-		// If para determinar o socket escolhido pelo cliente. Entretenimento ou Esportes
-		socket.joinGroup(grupo, ni);
+		// Um grupo para entretenimento e outro para esportes
+		InetSocketAddress grupoEsportes = new InetSocketAddress(ia, PORTA_ESPORTE);
+		InetSocketAddress grupoEntretenimento = new InetSocketAddress(ia, PORTA_ENTRETENIMENTO);
 
-		// Escolher o nome de usuário
+		System.out.println("Qual canal você deseja entrar?\n[1] - Esportes\n[2] - Entretenimento\n");
+		String porta = sc.nextLine();
 
-		while (!msg.equals("SAIR")) {
-			// System.out.println("[Cliente] Esperando por mensagem Multicast...");
-			System.out.print("[Servidor] Digite a mensagem: ");
-
-			byte[] envio = new byte[1024];
-			
- 			// If para determinar o socket escolhido pelo cliente. Entretenimento ou Esportes
-
-			DatagramPacket packet = new DatagramPacket(envio, envio.length, PORT);
-			socket.receive(packet);
-
-			msg = new String(packet.getData());
-			System.out.println("[Cliente] Mensagem recebida do Servidor: " + msg);
-
+		System.out.println("Agora, escolha o seu usário: ");
+		String usuario = sc.nextLine();
+		
+		if (porta.equals("1")) {
+			socketEsporte.joinGroup(grupoEsportes, ni);
+		} 
+		else if (porta.equals("2")) {
+			socketEntretenimento.joinGroup(grupoEntretenimento, ni);
 		}
 
-		System.out.println("[Cliente] Conexao Encerrada!");
-		socket.leaveGroup(grupo, ni);
-		socket.close();
+		// while (!mensagem.equals("SAIR")) {
 
+		// }
+
+		System.out.println("[" + LocalDate.now() + "] " + usuario  + " saiu do grupo");
+		
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'run'");
 	}
 
 }
